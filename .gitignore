@@ -1,0 +1,16 @@
+vscode/
+.vscode
+lib/
+.class
+*class
+*.exe
+obj/
+Debug/
+.cache
+cache
+bin/
+*.dll
+.db
+*.db
+.classpath
+.DS_Store
