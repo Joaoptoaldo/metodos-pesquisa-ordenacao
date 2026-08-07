@@ -1,9 +1,8 @@
 Desafio:
 
 Criar uma classe que tenha métodos para:
-  1) Ler dados de arquivo (inseridos em abaixo do outro) e popular em uma lista
+  1) Ler dados de arquivo (inseridos um abaixo do outro) e popular em uma lista
   2) Exibir a lista populada
-
 
 Fazer um programa principal que tenha um menu:
   1) Carregar arquivo
@@ -15,4 +14,5 @@ Projeto de SW:
     - Model => classes de dados
     - View => interação com o usuário
     - Controller => regras de negócio
-    
+
+
