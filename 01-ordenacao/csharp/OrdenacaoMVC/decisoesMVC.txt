@@ -1,0 +1,16 @@
+DECISÕES MVC
+
+- record em ResultadoOrdenacao: value object imutável, long nos contadores
+
+- GeradorLista static + retorna List<int>: caller decide o ciclo
+
+- IAlgoritmoOrdenacao: 4 variações do mesmo conceito, Controller polimórfico, menu monta sozinho
+
+- Sem Strategy/DI/factory: overkill pra 4 classes sem dependência
+
+- Stopwatch dentro do algoritmo: medir não pode ser opcional do caller
+
+- ObterLista retorna IReadOnlyList<int>: View só lê, não modifica
+
+- Sem ViewModel/Service/Repository/testes: Model e View trocam só 2 tipos, sem persistência, não foi pedido
+
