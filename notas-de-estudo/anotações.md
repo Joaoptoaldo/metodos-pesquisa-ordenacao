@@ -712,7 +712,7 @@ void shell(Lista<> lista) {
 
     10  10  10  20  20  30  40  80  90
 
-```
+```c
 int particiona(int *vetor, int ini, int fim) {
     int pivo;
     int tmp; //para as trocas
@@ -757,3 +757,130 @@ void quickSort(int *vetor, int ini, int fim) { //método recurisivo baseado em �
 }
 ```
 
+
+### 8) MERGESORT (como o quicksort, USA O CONCEITO DE DIVIDIR PARA CONQUISTAR)
+Faz parte de uma categoria de métodos de ordenação que utilizam a divisão da estrutura para acelerar a ordenação. Essa divisão é realizada por 
+meio de RECURSÃO.
+
+Contudo, diferente do QUICKSORT, o MERGESORT sempre divide a estrutura no meio (vai existir uma variável meio)
+
+- A estrutura possui 2 porções: parte esquerda e parte direita, divididas pelo MEIO. Pensar como se fosse uma ÁRVORE BINÁRIA
+- O método possui duas funções: merge (processo recursivo) e o intercala (a ordenação vai funcionar no desempilhamento do processo em que intercala e ordena)
+
+```java
+public class MergeSort {
+
+    // Variáveis de instância para rastreamento (equivalentes às globais do exemplo em C)
+    public static int qtdComparacoes = 0;
+    public static int qtdTrocas = 0; // Representa as movimentações/cópias de elementos
+
+    // Função que intercala e ordena as metades no desempilhamento
+    public static void intercala(int[] vetor, int ini, int meio, int fim) {
+        int i = ini;         // Índice da primeira metade
+        int j = meio + 1;    // Índice da segunda metade
+        int k = 0;           // Índice para o vetor auxiliar
+        
+        // Cria o vetor temporário para auxiliar na junção
+        int[] vetorAux = new int[fim - ini + 1];
+
+        // Compara e intercala os elementos das duas metades
+        while (i <= meio && j <= fim) {
+            qtdComparacoes++;
+            if (vetor[i] <= vetor[j]) {
+                vetorAux[k] = vetor[i];
+                i++;
+            } else {
+                vetorAux[k] = vetor[j];
+                j++;
+            }
+            k++;
+        }
+
+        // Copia os elementos restantes da primeira metade, se houver
+        while (i <= meio) {
+            vetorAux[k] = vetor[i];
+            i++;
+            k++;
+        }
+
+        // Copia os elementos restantes da segunda metade, se houver
+        while (j <= fim) {
+            vetorAux[k] = vetor[j];
+            j++;
+            k++;
+        }
+
+        // Transfere os elementos ordenados do vetor auxiliar de volta para o vetor original
+        for (i = ini, k = 0; i <= fim; i++, k++) {
+            qtdTrocas++; 
+            vetor[i] = vetorAux[k];
+        }
+    }
+
+    // Função recursiva baseada em árvore binária balanceada
+    public static void mergeSort(int[] vetor, int ini, int fim) {
+        if (ini < fim) {
+            int meio = (ini + fim) / 2; // Divide a estrutura exatamente no meio
+
+            mergeSort(vetor, ini, meio);     // Divide a metade esquerda
+            mergeSort(vetor, meio + 1, fim); // Divide a metade direita
+
+            // A ordenação real acontece aqui, no desempilhamento
+            intercala(vetor, ini, meio, fim);
+        }
+    }
+
+    // Método principal para demonstração e testes
+    public static void main(String[] args) {
+        // Vetor baseado no exemplo do enunciado do QuickSort
+        int[] vetor = {30, 90, 10, 20, 80, 10, 20, 40, 10};
+
+        System.out.println("Vetor original:");
+        imprimirVetor(vetor);
+
+        // Executa o Merge Sort
+        mergeSort(vetor, 0, vetor.length - 1);
+
+        System.out.println("\nVetor ordenado:");
+        imprimirVetor(vetor);
+
+        System.out.println("\nEstatísticas:");
+        System.out.println("Quantidade de comparações: " + qtdComparacoes);
+        System.out.println("Quantidade de cópias/trocas: " + qtdTrocas);
+    }
+
+    // Método auxiliar para exibir o vetor na tela
+    private static void imprimirVetor(int[] vetor) {
+        for (int num : vetor) {
+            System.out.print(num + " ");
+        }
+        System.out.println();
+    }
+}
+```
+---
+
+Aula 07 (10/09/2026)
+
+Mergesort 
+
+    - Categoria de codificação complexa
+    - Complexidade: O(n * log n)
+    - Implementado no ecossistema Java
+    - Método recursivo que dividade a estrutura para ordenar
+        - primeiro método: recursão
+        - segundo método: intercalação (aqui occorre a ordenação; e é o retorno do empilhamento ou da chamada recursiva)
+        - SEMPRE divide a estrutura mais ao meio (uniforme)
+        - volta da recursão -> intercalação
+
+Quicksort
+
+    - Categoria de codificação complexa
+    - Complexidade: O(n * log n)
+    - Implementado no ecossistema C#
+    - Método recursivo que divide as estrutura para ordenar (princípio de árvore)
+        - primeiro método: recursão
+        - segundo método: posicionar o pivo na estrutura
+        - NUNCA divide a estrutura de forma uniforme (PIVO)
+        - recursão: posicionar pivo
+        
