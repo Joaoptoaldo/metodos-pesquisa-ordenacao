@@ -35,8 +35,8 @@ public class Ordenacao {
         long qtdComparacoes = 0;
         long qtdTrocas = 0;
         int i, j, posMenor, aux;
-        posMenor = 0;
-        
+        // posMenor = 0; removido, será definido no loop
+
         for (i = 0; i < lista.size(); i++) {
             posMenor = i;
             for (j = i+1; j < lista.size(); j++) {
@@ -45,12 +45,13 @@ public class Ordenacao {
                     posMenor = j;
                 }
             }
-        }
-        if (posMenor != i) {
-            aux = lista.get(i);
-            lista.set(i, lista.get(posMenor));
-            lista.set(posMenor, aux);
-            qtdTrocas++;
+            // CORREÇÃO: swap deve estar DENTRO do loop externo (i), não fora
+            if (posMenor != i) {
+                aux = lista.get(i);
+                lista.set(i, lista.get(posMenor));
+                lista.set(posMenor, aux);
+                qtdTrocas++;
+            }
         }
         metricas.add((float)qtdComparacoes);
         metricas.add((float)qtdTrocas);
@@ -65,9 +66,16 @@ public class Ordenacao {
 
         for (i = 1; i < lista.size(); i++) {
             aux = lista.get(i);
-            for (j = i-1; j > 0 && aux < lista.get(j); j-- , qtdComparacoes++) {
-                qtdTrocas++;
-                lista.set(j+1, lista.get(j));
+            // CORREÇÃO: j >= 0 (não j > 0) para comparar com lista.get(0)
+            // CORREÇÃO: conta a comparação que falha (quando aux >= lista.get(j))
+            
+            for (j = i-1; j >= 0; j--, qtdComparacoes++) {
+                if (aux < lista.get(j)) {
+                    qtdTrocas++;
+                    lista.set(j+1, lista.get(j));
+                } else {
+                    break; // achou posição correta
+                }
             }
             lista.set(j+1, aux);
         }

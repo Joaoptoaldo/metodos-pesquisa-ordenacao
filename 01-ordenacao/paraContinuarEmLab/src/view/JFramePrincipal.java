@@ -182,6 +182,45 @@ public class JFramePrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonExecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExecutarActionPerformed
+        if (Model.lista == null || Model.lista.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Carregue um arquivo primeiro", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Cria cópia da lista para não alterar a original
+        ArrayList<Integer> listaOrdenar = new ArrayList<>(Model.lista);
+
+        String metodoSelecionado = (String) jComboBoxMetodos.getSelectedItem();
+        ArrayList<Float> metricas = null;
+        long tempoInicio = System.currentTimeMillis();
+
+        switch (metodoSelecionado) {
+            case "Bolha":
+                metricas = Ordenacao.bolha(listaOrdenar);
+                break;
+            case "Inserção":
+                metricas = Ordenacao.insercao(listaOrdenar);
+                break;
+            case "Pente":
+                metricas = Ordenacao.pente(listaOrdenar);
+                break;
+            case "Seleção":
+                metricas = Ordenacao.selecao(listaOrdenar);
+                break;
+            default:
+                JOptionPane.showMessageDialog(this, "Selecione um método de ordenação", "Atenção", JOptionPane.WARNING_MESSAGE);
+                return;
+        }
+
+        long tempoFim = System.currentTimeMillis();
+        long tempoDecorrido = tempoFim - tempoInicio;
+
+        // Exibe resultados nos campos
+        jTextFieldQtdNumeros.setText(String.valueOf(Model.lista.size()));
+        jTextFieldQtdComparacoes.setText(String.valueOf(metricas.get(0).longValue()));
+        jTextFieldQtdTrocas.setText(String.valueOf(metricas.get(1).longValue()));
+        jTextFieldTempo.setText(String.valueOf(tempoDecorrido));
+
         jPanelResultados.setVisible(true);
     }//GEN-LAST:event_jButtonExecutarActionPerformed
 
