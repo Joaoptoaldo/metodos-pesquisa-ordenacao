@@ -4,19 +4,19 @@
  */
 package view;
 
-import model.Model;
 import controller.Ordenacao;
 import controller.Util;
-
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import model.Model;
 
 /**
  *
  * @author laboratorio
  */
 public class JFramePrincipal extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(JFramePrincipal.class.getName());
 
     /**
@@ -26,6 +26,29 @@ public class JFramePrincipal extends javax.swing.JFrame {
         initComponents();
         jPanelResultados.setVisible(false);
         Model.lista = new ArrayList<>();
+        atualizarTabela(Model.lista);
+    }
+
+    /**
+     * Atualiza o JTable com os valores da lista informada
+     * @param lista lista de inteiros a ser exibida
+     */
+    private void atualizarTabela(ArrayList<Integer> lista) {
+        DefaultTableModel modelo = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // tabela somente leitura
+            }
+        };
+
+        // adiciona colunas ao modelo
+        modelo.addColumn("Posição");
+        modelo.addColumn("Valor");
+
+        for (int i = 0; i < lista.size(); i++) {
+            modelo.addRow(new Object[]{i, lista.get(i)});
+        }
+        jTableLista.setModel(modelo);
     }
 
     /**
@@ -44,6 +67,8 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jComboBoxMetodos = new javax.swing.JComboBox<>();
         jButtonExecutar = new javax.swing.JButton();
+        jScrollPaneLista = new javax.swing.JScrollPane();
+        jTableLista = new javax.swing.JTable();
         jPanelResultados = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jTextFieldQtdNumeros = new javax.swing.JTextField();
@@ -63,13 +88,37 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jButtonAbrir.addActionListener(this::jButtonAbrirActionPerformed);
 
         jButtonLimpar.setText("Limpar");
+        jButtonLimpar.addActionListener(this::jButtonLimparActionPerformed);
 
         jLabel2.setText("Métodos de Ordenação:");
 
-        jComboBoxMetodos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Bolha", "Inserção", "Pente", "Seleção", " " }));
+        jComboBoxMetodos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Bolha", "Inserção", "Pente", "Seleção", "MergeSort", "QuickSort" }));
 
         jButtonExecutar.setText("Executar");
         jButtonExecutar.addActionListener(this::jButtonExecutarActionPerformed);
+
+        jTableLista.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {},
+            new String [] {
+                "Posição", "Valor"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.Integer.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPaneLista.setViewportView(jTableLista);
 
         jLabel3.setText("Quantidade de Números: ");
 
@@ -140,6 +189,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
                 .addGap(17, 17, 17)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanelResultados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPaneLista, javax.swing.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -175,7 +225,10 @@ public class JFramePrincipal extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonExecutar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelResultados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPaneLista, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelResultados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -207,6 +260,12 @@ public class JFramePrincipal extends javax.swing.JFrame {
             case "Seleção":
                 metricas = Ordenacao.selecao(listaOrdenar);
                 break;
+            case "MergeSort":
+                metricas = Ordenacao.mergesort(listaOrdenar);
+                break;
+            case "QuickSort":
+                metricas = Ordenacao.quicksort(listaOrdenar);
+                break;
             default:
                 JOptionPane.showMessageDialog(this, "Selecione um método de ordenação", "Atenção", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -221,6 +280,9 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jTextFieldQtdTrocas.setText(String.valueOf(metricas.get(1).longValue()));
         jTextFieldTempo.setText(String.valueOf(tempoDecorrido));
 
+        // Exibe a lista ordenada no JTable
+        atualizarTabela(listaOrdenar);
+
         jPanelResultados.setVisible(true);
     }//GEN-LAST:event_jButtonExecutarActionPerformed
 
@@ -228,14 +290,30 @@ public class JFramePrincipal extends javax.swing.JFrame {
         if (jTextFieldNomeArquivo.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Informe nome do arquivo", "Atenção", JOptionPane.ERROR_MESSAGE);
         } else {
+            // Limpa a lista antes de carregar novo arquivo
+            Model.lista.clear();
             if (Util.carregarArquivoEmLista(jTextFieldNomeArquivo.getText(), Model.lista)) {
                 JOptionPane.showMessageDialog(this, "Lista carregada com sucesso", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                atualizarTabela(Model.lista);
             } else {
                 JOptionPane.showMessageDialog(this, "Problemas para ler o arquivo e carregar a lista", "Erro", JOptionPane.ERROR_MESSAGE);
                 jTextFieldNomeArquivo.setText("");
+                atualizarTabela(Model.lista);
             }
         }
     }//GEN-LAST:event_jButtonAbrirActionPerformed
+
+    private void jButtonLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLimparActionPerformed
+        jTextFieldNomeArquivo.setText("");
+        jComboBoxMetodos.setSelectedIndex(0);
+        jTextFieldQtdNumeros.setText("");
+        jTextFieldQtdComparacoes.setText("");
+        jTextFieldQtdTrocas.setText("");
+        jTextFieldTempo.setText("");
+        jPanelResultados.setVisible(false);
+        Model.lista.clear();
+        atualizarTabela(Model.lista);
+    }//GEN-LAST:event_jButtonLimparActionPerformed
 
     /**
      * @param args the command line arguments
@@ -244,7 +322,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -260,10 +338,10 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new JFramePrincipal().setVisible(true));
-       
+
     }
 
-      
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAbrir;
     private javax.swing.JButton jButtonExecutar;
@@ -276,6 +354,8 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanelResultados;
+    private javax.swing.JScrollPane jScrollPaneLista;
+    private javax.swing.JTable jTableLista;
     private javax.swing.JTextField jTextFieldNomeArquivo;
     private javax.swing.JTextField jTextFieldQtdComparacoes;
     private javax.swing.JTextField jTextFieldQtdNumeros;
