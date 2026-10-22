@@ -7,14 +7,26 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import servidor.model.Sessao;
+import servidor.model.TabelaHash;
 
 public class Utilidades {
 
     public static boolean carregarArquivoEmHashMap(String nomeArquivo, HashMap<String, Sessao> sessoes, StringBuilder dadosSessoes) {
+        TabelaHash tabela = new TabelaHash();
+        if (!carregarArquivo(nomeArquivo, tabela, dadosSessoes)) {
+            return false;
+        }
+        sessoes.clear();
+        sessoes.putAll(tabela.sessoes);
+        return true;
+    }
+
+    public static boolean carregarArquivo(String nomeArquivo, TabelaHash tabela, StringBuilder dadosSessoes) {
         try {
             Path caminho = Paths.get(nomeArquivo);
 
             List<String> linhas = Files.readAllLines(caminho);
+            tabela.limpar();
 
             for (String linha : linhas) {
 
@@ -25,7 +37,7 @@ public class Utilidades {
 
                     if (dadosLinha.length >= 2) {
                         Sessao sessao = new Sessao(dadosLinha[0], dadosLinha[1]);
-                        sessoes.put(sessao.numeroCelular, sessao);
+                        tabela.adicionar(sessao);
                     }
                 }
             }

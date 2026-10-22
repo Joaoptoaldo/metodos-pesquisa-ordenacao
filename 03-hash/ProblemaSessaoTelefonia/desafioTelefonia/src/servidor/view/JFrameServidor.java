@@ -6,6 +6,7 @@ package servidor.view;
 
 import javax.swing.JOptionPane;
 import servidor.model.TabelaHash;
+import servidor.service.ServidorTelefonia;
 import servidor.util.Utilidades;
 
 /**
@@ -23,6 +24,13 @@ public class JFrameServidor extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         tabela = new TabelaHash();
+        servidor = new ServidorTelefonia(tabela);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                servidor.close();
+            }
+        });
     }
 
     /**
@@ -140,9 +148,16 @@ public class JFrameServidor extends javax.swing.JFrame {
             jTextFieldNomeArquivo.requestFocus();
             return ;
         }
-        if (!Utilidades.carregarArquivoEmHashMap(jTextFieldNomeArquivo.getText(), tabela.sessoes, dadosSessoes)) {
+        if (!Utilidades.carregarArquivo(jTextFieldNomeArquivo.getText(), tabela, dadosSessoes)) {
             JOptionPane.showMessageDialog(this, "Arquivo não localizado ou\n" + "com problemas");
             return ;
+        }
+        try {
+            servidor.iniciar();
+        } catch (java.io.IOException e) {
+            JOptionPane.showMessageDialog(this,
+                    "A base foi carregada, mas o servidor não pôde iniciar:\n" + e.getMessage());
+            return;
         }
         jTextAreaDadosSessoes.setText(dadosSessoes.toString());
         
@@ -150,17 +165,29 @@ public class JFrameServidor extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonCarregarArquivoActionPerformed
 
     private void jTextFieldNumeroCelularPesquisaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldNumeroCelularPesquisaActionPerformed
-        // TODO add your handling code here:
+        pesquisarNumeroCelular();
     }//GEN-LAST:event_jTextFieldNumeroCelularPesquisaActionPerformed
 
     private void jButtonPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPesquisarActionPerformed
-        // TODO add your handling code here:
-        if (jTextFieldNomeArquivo.getText().equals("")) {
+        pesquisarNumeroCelular();
+    }//GEN-LAST:event_jButtonPesquisarActionPerformed
+
+    private void pesquisarNumeroCelular() {
+        String numeroCelular = jTextFieldNumeroCelularPesquisa.getText().trim();
+        if (numeroCelular.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Número de celular não informado!");
             jTextFieldNumeroCelularPesquisa.requestFocus();
             return ;
         }
-    }//GEN-LAST:event_jButtonPesquisarActionPerformed
+
+        servidor.model.Sessao sessao = tabela.pesquisar(numeroCelular);
+        if (sessao == null) {
+            jTextAreaResultadoPesquisa.setText("Número de celular não encontrado.");
+            return;
+        }
+
+        jTextAreaResultadoPesquisa.setText(sessao.dadosSessao);
+    }
 
     private void jTextFieldNomeArquivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldNomeArquivoActionPerformed
         // TODO add your handling code here:
@@ -192,6 +219,7 @@ public class JFrameServidor extends javax.swing.JFrame {
     }
     
     TabelaHash tabela;
+    ServidorTelefonia servidor;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCarregarArquivo;
