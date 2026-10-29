@@ -1,0 +1,10 @@
+Uma Tabela Hash é uma estrutura de dados projetada para armazenar e buscar informações de forma extremamente rápida.
+
+Em resumo, o método funciona através de três pilares principais:
+• Mapeamento Direto: Em vez de percorrer uma lista item por item para encontrar um valor, a estrutura calcula matematicamente onde o dado deve ser guardado ou encontrado.
+• Função Hash: É a fórmula (no seu caso, comprimento da string % tamanho do vetor) que transforma uma informação (o nome) em um índice numérico válido (o endereço do vetor).
+• Tratamento de Colisões (Encadeamento): Como dois nomes diferentes podem gerar o mesmo índice, o método usa um array de listas. Se houver um "empate" no endereço, 
+os nomes são empilhados em uma lista naquela mesma posição, evitando que um dado apague o outro.
+
+Na prática, isso transforma uma busca que exigiria olhar elemento por elemento em uma operação quase instantânea, pois o programa vai direto ao endereço correto.
+Gostaria de ver um exemplo visual de como a memória fica organizada quando ocorre uma colisão (dois nomes no mesmo endereço) ou prefere focar em outro assunto?
