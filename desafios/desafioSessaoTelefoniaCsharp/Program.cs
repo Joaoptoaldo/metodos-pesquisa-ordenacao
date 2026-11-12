@@ -1,5 +1,6 @@
 using DesafioSessaoTelefoniaCsharp.Repositories;
 using DesafioSessaoTelefoniaCsharp.Services;
+using DesafioSessaoTelefoniaCsharp.View;
 
 namespace DesafioSessaoTelefoniaCsharp;
 
@@ -39,7 +40,8 @@ public static class Program
             return;
         }
 
-        ExecutarMenu(tabela);
+        var menu = new MenuView(tabela);
+        menu.Executar();
     }
 
     private static string ObterCaminhoArquivo(string[] args)
@@ -56,46 +58,5 @@ public static class Program
         }
 
         return Path.Combine(AppContext.BaseDirectory, nomeArquivo);
-    }
-
-    private static void ExecutarMenu(TabelaSessoes tabela)
-    {
-        while (true)
-        {
-            Console.WriteLine();
-            Console.WriteLine("Pesquisa de sessoes de telefonia");
-            Console.WriteLine("1 - Pesquisar por numero de celular");
-            Console.WriteLine("0 - Sair");
-            Console.Write("Opcao: ");
-
-            var opcao = Console.ReadLine()?.Trim();
-            if (opcao == "0")
-            {
-                return;
-            }
-
-            if (opcao != "1")
-            {
-                Console.WriteLine("Opcao invalida.");
-                continue;
-            }
-
-            Console.Write("Numero de celular: ");
-            var numeroCelular = Console.ReadLine()?.Trim();
-            if (string.IsNullOrWhiteSpace(numeroCelular))
-            {
-                Console.WriteLine("Informe um numero de celular.");
-                continue;
-            }
-
-            if (tabela.TentarPesquisar(numeroCelular, out var sessao))
-            {
-                Console.WriteLine($"Sessao encontrada: {sessao}");
-            }
-            else
-            {
-                Console.WriteLine("Nenhuma sessao encontrada para esse numero.");
-            }
-        }
     }
 }
